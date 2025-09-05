@@ -1,80 +1,155 @@
-import { Image } from "expo-image"
-import { Platform, StyleSheet } from "react-native"
-
-import { HelloWave } from "@/components/HelloWave"
-import ParallaxScrollView from "@/components/ParallaxScrollView"
-import { ThemedText } from "@/components/ThemedText"
-import { ThemedView } from "@/components/ThemedView"
+import React, { useState } from "react"
+import {
+  Platform,
+  SafeAreaView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native"
 
 export default function HomeScreen() {
+  const [darkMode, setDarkMode] = useState(false)
+  const [search, setSearch] = useState("")
+
+  const themeStyles = darkMode ? darkStyles : styles
+
+  // Status bar color
+  React.useEffect(() => {
+    StatusBar.setBarStyle(darkMode ? "light-content" : "dark-content")
+    if (Platform.OS === "android") {
+      StatusBar.setBackgroundColor(darkMode ? "#181818" : "#fff")
+    }
+  }, [darkMode])
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: "#A1CEDC", dark: "#1D3D47" }}
-      headerImage={
-        <Image
-          source={require("@/assets/images/partial-react-logo.png")}
-          style={styles.reactLogo}
+    <SafeAreaView style={themeStyles.safeArea}>
+      <View style={themeStyles.container}>
+        <TouchableOpacity
+          style={themeStyles.modeSwitch}
+          onPress={() => setDarkMode((prev) => !prev)}
+        >
+          <Text style={themeStyles.modeSwitchText}>
+            {darkMode ? "☀️ Light Mode" : "🌙 Dark Mode"}
+          </Text>
+        </TouchableOpacity>
+        <Text style={themeStyles.logo}>Cidian</Text>
+        <Text style={themeStyles.hanzi}>词典</Text>
+        <Text style={themeStyles.subtitle}>Chinese-English dictionary</Text>
+        <TextInput
+          style={themeStyles.input}
+          placeholder="Search..."
+          placeholderTextColor={darkMode ? "#aaa" : "#888"}
+          value={search}
+          onChangeText={setSearch}
         />
-      }
-    >
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit{" "}
-          <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText>{" "}
-          to see changes. Press{" "}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: "cmd + d",
-              android: "cmd + m",
-              web: "F12",
-            })}
-          </ThemedText>{" "}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">
-            npm run reset-project
-          </ThemedText>{" "}
-          to get a fresh <ThemedText type="defaultSemiBold">app</ThemedText>{" "}
-          directory. This will move the current{" "}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{" "}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+        <View style={themeStyles.results} />
+      </View>
+    </SafeAreaView>
   )
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: "row",
+  safeArea: {
+    flex: 1,
+    backgroundColor: "#fff",
+    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight || 12 : 12,
+  },
+  container: {
+    flex: 1,
+    padding: 24,
     alignItems: "center",
-    gap: 8,
+    justifyContent: "flex-start",
   },
-  stepContainer: {
-    gap: 8,
+  logo: {
+    fontSize: 40,
+    fontWeight: "bold",
+    marginTop: 32,
+    letterSpacing: 2,
+    color: "#222",
+  },
+  hanzi: {
+    fontSize: 64,
+    fontWeight: "bold",
+    color: "#222",
+    marginVertical: 8,
+  },
+  subtitle: {
+    fontSize: 18,
+    color: "#444",
+    marginBottom: 32,
+  },
+  input: {
+    width: "100%",
+    maxWidth: 400,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 8,
+    fontSize: 18,
+    marginBottom: 24,
+    color: "#222",
+    backgroundColor: "#fff",
+  },
+  results: {
+    width: "100%",
+    maxWidth: 400,
+    minHeight: 120,
+    borderWidth: 1,
+    borderColor: "#eee",
+    borderRadius: 8,
+    backgroundColor: "#fafafa",
+  },
+  modeSwitch: {
+    alignSelf: "flex-end",
     marginBottom: 8,
+    padding: 8,
+    borderRadius: 6,
+    backgroundColor: "#f0f0f0",
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: "absolute",
+  modeSwitchText: {
+    color: "#333",
+    fontSize: 16,
+  },
+})
+
+const darkStyles = StyleSheet.create({
+  ...styles,
+  safeArea: {
+    ...styles.safeArea,
+    backgroundColor: "#181818",
+  },
+  logo: {
+    ...styles.logo,
+    color: "#fff",
+  },
+  hanzi: {
+    ...styles.hanzi,
+    color: "#fff",
+  },
+  subtitle: {
+    ...styles.subtitle,
+    color: "#ccc",
+  },
+  input: {
+    ...styles.input,
+    backgroundColor: "#222",
+    color: "#fff",
+    borderColor: "#444",
+  },
+  results: {
+    ...styles.results,
+    backgroundColor: "#222",
+    borderColor: "#333",
+  },
+  modeSwitch: {
+    ...styles.modeSwitch,
+    backgroundColor: "#222",
+  },
+  modeSwitchText: {
+    ...styles.modeSwitchText,
+    color: "#fff",
   },
 })
